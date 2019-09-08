@@ -3,13 +3,13 @@ const createError = require('http-errors')
 const path = require('path')
 const configs = require('./config')
 
-//const SpeakerService = require('./services/SpeakerService')
+const SpeakerService = require('./services/SpeakerService')
 
 const app = express()
 
 const config = configs[app.get('env')];
 
-//const speakerService = new SpeakerService(config.data.speakers)
+const speakerService = new SpeakerService(config.data.speakers)
 
 app.set('view engine', 'pug')
 
@@ -25,24 +25,25 @@ const routes = require('./routes')
 
 app.listen(3000)
 
-/*app.use(async (req, res, next) => {
+
+app.use(express.static('public'))
+app.get('/favicon.ico', (req, res, next) => {
+    return res.sendStatus(204);
+})
+
+app.use(async (req, res, next) => {
     try {
-        const names = await speakerService.getNames();
+        const names = await speakerService.getNames()
         res.locals.speakerNames = names;
         return next()
     } catch(err) {
         return next(err)
     }
 })
-*/
-app.use(express.static('public'))
-app.get('/favicon.ico', (req, res, next) => {
-    return res.sendStatus(204);
-})
 
-
-
-app.use('/', routes())
+app.use('/', routes({
+    speakerService: speakerService,
+}))
 
 app.use((req, res, next) => {
     return next(createError(404,'File not found'))

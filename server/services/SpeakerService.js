@@ -5,7 +5,7 @@ const readFile = util.promisify(fs.readFile)
 
 class SpeakerService {
     constructor(datafile) {
-        this.datafile = datafile;
+        this.datafile = datafile
     }
 
     async getNames() {
@@ -20,7 +20,7 @@ class SpeakerService {
     }
 
     async getListShort() {
-        const data = await this.getData();
+        const data = await this.getData()
 
         return data.map((speaker) => {
             return { 
@@ -32,7 +32,7 @@ class SpeakerService {
     }
 
     async getList() {
-        const data = await this.getData();
+        const data = await this.getData()
 
         return data.map((speaker) => {
             return { 
@@ -44,15 +44,51 @@ class SpeakerService {
         })
     }
 
+    async getSpeaker(shortname) {
+        const data = await this.getData()
+        const speaker = data.find((speaker) => {
+            return speaker.shortname === shortname;
+        })
+
+        if(!speaker) return null
+        
+        return {
+            title: speaker.title,
+            name: speaker.name,
+            shortname: speaker.shortname,
+            description: speaker.description,
+        }
+    }
+
+    async getArtworkForSpeaker(shortname) {
+        const data = await this.getData()
+        const speaker = data.find((speaker) => {
+            return speaker.shortname === shortname;
+        })
+
+        if(!speaker || !speaker.artwork) return null
+        return speaker.artwork
+    }
+
     async getAllArtwork() {
-        const data = await this.getData();
+        const data = await this.getData()
         const artwork = data.reduce((acc, elm) => {
             if(elm.artwork) {
                 acc = [...acc, ...elm.artwork]
             }
-            return acc;
+            return acc
         }, [])
-        return artwork;
+        return artwork
+    }
+
+    async getSpeakerArtwork() {
+        const data = await this.getData()
+        return data.map((speaker) => {
+            return {
+                shortname: speaker.shortname,
+                artwork: speaker.artwork,
+            }
+        })
     }
 
     async getData() {

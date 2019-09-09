@@ -16,7 +16,7 @@ module.exports = (param) => {
             promises.push( speakerService.getAllArtwork() )
     
             const results = await Promise.all(promises)
-    
+
             return res.render('index', {
                 page: 'Home',
                 speakerslist: results[0],

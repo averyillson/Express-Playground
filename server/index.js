@@ -1,15 +1,18 @@
 const express = require('express')
 const createError = require('http-errors')
 const path = require('path')
+const bodyParser = require('body-parser')
 const configs = require('./config')
 
 const SpeakerService = require('./services/SpeakerService')
+const FeedbackService = require('./services/FeedbackService')
 
 const app = express()
 
 const config = configs[app.get('env')];
 
 const speakerService = new SpeakerService(config.data.speakers)
+const feedbackService = new FeedbackService(config.data.feedback)
 
 app.set('view engine', 'pug')
 
@@ -23,8 +26,9 @@ app.locals.title = config.sitename;
 
 const routes = require('./routes')
 
-app.listen(3000)
+app.use(bodyParser.urlencoded({extended: true}))
 
+app.listen(3000)
 
 app.use(express.static('public'))
 app.get('/favicon.ico', (req, res, next) => {
@@ -42,7 +46,8 @@ app.use(async (req, res, next) => {
 })
 
 app.use('/', routes({
-    speakerService: speakerService,
+    speakerService,
+    feedbackService
 }))
 
 app.use((req, res, next) => {
